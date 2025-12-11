@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Profile - SpendWise{% endblock %}
+
+{% block content %}
+<style>
+  .profile-container {
+    background-color: #1e293b;
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 700px;
+    margin: 2rem auto;
+    color: white;
+  }
+
+  .profile-header {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .profile-header i {
+    font-size: 1.5rem;
+    color: #00ff95;
+  }
+
+  .profile-form label {
+    font-weight: bold;
+    margin-top: 1rem;
+    display: block;
+  }
+
+  .profile-form input {
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: white;
+    padding: 0.5rem;
+    width: 100%;
+    margin-top: 0.3rem;
+  }
+
+  .profile-form button {
+    margin-top: 1.5rem;
+    background-color: #00ff95;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .profile-form button:hover {
+    background-color: #06e48a;
+  }
+
+  .danger-zone {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #334155;
+  }
+
+  .danger-zone h3 {
+    color: #f87171;
+  }
+
+  .delete-btn {
+    background-color: #ef4444;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .delete-btn:hover {
+    background-color: #dc2626;
+  }
+</style>
+
+<div class="profile-container">
+  <div class="profile-header">
+    <i class="fas fa-user-circle"></i>
+    Account Settings
+  </div>
+  <p>Manage your profile and account preferences</p>
+
+  <form method="post" class="profile-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <label for="{{ form.name.id_for_label }}">Name</label>
+    {{ form.name }}
+
+    <label for="{{ form.email.id_for_label }}">Email</label>
+    {{ form.email }}
+
+    <label for="{{ form.phone.id_for_label }}">Phone</label>
+    {{ form.phone }}
+
+    <label for="{{ form.monthly_budget.id_for_label }}">Monthly Budget</label>
+    {{ form.monthly_budget }}
+
+    <button type="submit">Update Profile</button>
+  </form>
+
+  <div class="danger-zone">
+    <!-- <h3>Danger Zone</h3> -->
+    <form method="post" action="{% url 'delete_account' %}" onsubmit="return confirm('Are you sure you want to delete your account? This cannot be undone.');">
+      {% csrf_token %}
+      <button class="delete-btn" type="submit">Delete Account</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

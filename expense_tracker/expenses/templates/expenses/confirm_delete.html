@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Delete - SpendWise{% endblock %}
+
+{% block content %}
+  <div style="max-width: 500px; text-align: center;">
+    <h2 style="font-size: 22px; margin-bottom: 20px; color: #ff6666;">
+      ⚠️ Confirm Delete
+    </h2>
+    <p style="margin-bottom: 30px;">
+      Are you sure you want to delete the expense:
+      <strong>{{ expense.title }}</strong> (₹{{ expense.amount }})?
+    </p>
+
+    <form method="post" style="display: flex; justify-content: center; gap: 15px;">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn" style="background-color: #ff4d4d;">
+        Yes, Delete
+      </button>
+      <a href="{% url 'dashboard' %}" class="logout-btn" style="background-color: #666;">
+        Cancel
+      </a>
+    </form>
+  </div>
+{% endblock %}

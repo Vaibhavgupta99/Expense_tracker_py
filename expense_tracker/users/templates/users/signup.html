@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up - SpendWise</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0b1220;
+      font-family: Arial, sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .form-box {
+      background-color: #1a2332;
+      padding: 30px 40px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+    }
+
+    h2 {
+      text-align: center;
+      color: #00ff95;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      outline: none;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      background-color: #2c374f;
+      color: white;
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: none;
+      border: none;
+      background-color: #2c374f;
+    }
+
+    .btn {
+      width: 100%;
+      background-color: #00ff95;
+      color: #000;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      background-color: #00e67a;
+    }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .footer-text a {
+      color: #00bfff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <h2>Create an Account</h2>
+    <form method="POST">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      {% for field in form %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}
+          <div style="color: red;">{{ error }}</div>
+        {% endfor %}
+      {% endfor %}
+
+      <button type="submit" class="btn">Sign Up</button>
+    </form>
+
+    <div class="footer-text">
+      Already have an account? <a href="{% url 'login' %}">Login</a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}Add Expense - SpendWise{% endblock %}
+
+{% block content %}
+<style>
+  .form-container {
+    max-width: 500px;
+    margin: 40px auto;
+    background-color: #1e293b;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 255, 149, 0.1);
+  }
+
+  .form-container h2 {
+    color: #00ff95;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .form-container label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .form-container input,
+  .form-container select,
+  .form-container textarea,
+  .form-container button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+
+  .form-container input,
+  .form-container select,
+  .form-container textarea {
+    margin-bottom: 16px;
+    background-color: #f9fafb;
+  }
+
+  .form-container button {
+    background-color: #00ff95;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .form-container button:hover {
+    background-color: #00e285;
+  }
+
+  .error {
+    color: red;
+    font-size: 14px;
+  }
+</style>
+
+<div class="form-container">
+  <h2>➕ Add New Expense</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    {% for field in form %}
+      <div>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}
+          <div class="error">{{ error }}</div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+
+    <button type="submit">Add Expense</button>
+  </form>
+</div>
+{% endblock %}

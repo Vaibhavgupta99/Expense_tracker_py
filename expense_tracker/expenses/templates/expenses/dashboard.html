@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - SpendWise{% endblock %}
+
+{% block content %}
+<style>
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #cbd5e1;
+  }
+
+  .dashboard-header p {
+    color: #94a3b8;
+    font-size: 16px;
+    margin-top: 5px;
+  }
+
+  .budget-form {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .budget-form input,
+  .budget-form button {
+    padding: 8px 12px;
+    font-size: 14px;
+    margin: 5px;
+    border-radius: 6px;
+    border: none;
+  }
+
+  .budget-form input {
+    width: 140px;
+  }
+
+  .budget-form button {
+    background-color: #22c55e;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .budget-form button:hover {
+    background-color: #16a34a;
+  }
+
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    background-color: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    flex: 1 1 200px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .card h3 {
+    color: #f1f5f9;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .card .value {
+    font-size: 22px;
+    font-weight: bold;
+  }
+
+  .red { color: #ef4444; }
+  .green { color: #22c55e; }
+  .orange { color: #f97316; }
+
+  .charts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    margin-bottom: 3rem;
+  }
+
+  .chart-card {
+    background-color: #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    flex: 1 1 400px;
+    text-align: center;
+  }
+
+  .chart-card h3 {
+    color: #f1f5f9;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .chart-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .expense-list h2 {
+    color: #f8fafc;
+    margin-bottom: 10px;
+  }
+
+  .expense-list table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1e293b;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .expense-list th, .expense-list td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #334155;
+    color: #e2e8f0;
+  }
+
+  .expense-list th {
+    background-color: #334155;
+  }
+
+  .action-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: white;
+    margin-right: 5px;
+  }
+
+  .edit {
+    background-color: #3b82f6;
+  }
+
+  .delete {
+    background-color: #ef4444;
+  }
+
+  .action-btn:hover {
+    opacity: 0.9;
+  }
+</style>
+
+<div class="dashboard-header">
+  <h1>Welcome, {{ user.name|default:user.email }}</h1>
+  <p>Today: {{ today }} | You've spent ₹{{ total_expense|floatformat:0 }} this month</p>
+</div>
+
+<!-- Monthly Budget Form -->
+<div class="budget-form">
+  <form method="post" action="{% url 'dashboard' %}">
+    {% csrf_token %}
+    <label for="budget">Monthly Budget: ₹</label>
+    <input type="number" name="budget" id="budget" min="0" value="{{ monthly_budget|default:50000 }}">
+    <button type="submit">Update Budget</button>
+  </form>
+</div>
+
+<!-- Summary Stats -->
+<div class="stats">
+  <div class="card">
+    <h3>This Month's Spend</h3>
+    <div class="value red">₹{{ total_expense|floatformat:0 }}</div>
+  </div>
+  <div class="card">
+    <h3>Remaining Budget</h3>
+    <div class="value green">₹{{ remaining_budget|floatformat:0 }}</div>
+  </div>
+  <div class="card">
+    <h3>Average Daily Spend</h3>
+    <div class="value orange">₹{{ avg_daily_expense|floatformat:0 }}</div>
+  </div>
+  <div class="card">
+    <h3>Biggest Single Expense</h3>
+    <div class="value">₹{{ highest_expense|floatformat:0 }}</div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="charts">
+  <div class="chart-card">
+    <h3>📉 Weekly Spending Trend</h3>
+    {% if weekly_chart %}
+      <img src="{% static weekly_chart %}" alt="Weekly Spending Chart">
+    {% else %}
+      <p>No data available</p>
+    {% endif %}
+  </div>
+  <div class="chart-card">
+    <h3>📊 Category-wise Expense Distribution</h3>
+    {% if category_chart %}
+      <img src="{% static category_chart %}" alt="Category Chart">
+    {% else %}
+      <p>No data available</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Expense Table -->
+<div class="expense-list">
+  <h2>📋 Expense History</h2>
+  {% if expenses %}
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Amount (₹)</th>
+          <th>Category</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for expense in expenses %}
+          <tr>
+            <td>{{ expense.title }}</td>
+            <td>₹{{ expense.amount }}</td>
+            <td>{{ expense.category }}</td>
+            <td>{{ expense.date }}</td>
+            <td>
+                <a href="{% url 'edit_expense' expense.id %}" class="action-btn edit">Edit</a>
+                <form method="post" action="{% url 'delete_expense' expense.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="action-btn delete" onclick="return confirm('Are you sure you want to delete this expense?');">Delete</button>
+                </form>
+            </td>
+            </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No expenses added yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
